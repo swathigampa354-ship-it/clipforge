@@ -1,24 +1,15 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "clipforge"
 version = "1.0.0"
-requires-python = ">=3.11"
+description = "AI Video Clipping SaaS - Turn long-form videos into viral short-form content"
+requires-python = ">=3.12"
+dependencies = []
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
 addopts = "-v --tb=short"
-
-[build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.backends._legacy:_Backend"
-
-[tool.ruff]
-line-length = 120
-target-version = "py311"
-
-[tool.ruff.lint]
-select = ["E", "F", "I", "B", "C4", "UP"]
-
-[tool.black]
-line-length = 120
-target-version = ["py311"]
