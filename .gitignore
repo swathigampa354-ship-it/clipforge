@@ -41,8 +41,13 @@ pnpm-debug.log*
 output/
 
 # Docker
-docker-compose*.yml
-.dockerignore
+Dockerfile.dockerignore
+Dockerfile.prod.dockerignore
+api/Dockerfile.dockerignore
+worker/Dockerfile.dockerignore
+frontend/Dockerfile.dockerignore
+# Only ignore environment-specific overrides
+docker-compose.gpu.yml.dockerignore
 
 # Database
 *.db
