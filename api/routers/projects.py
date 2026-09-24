@@ -91,5 +91,4 @@ async def list_videos(
     return ApiResponse(data=[VideoResponse.model_validate(v) for v in videos])
 
 
-from fastapi import APIRouter as APIRouterType
-router = APIRouter()
+

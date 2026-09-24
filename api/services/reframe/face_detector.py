@@ -33,15 +33,14 @@ class FaceDetectionService:
         if not video:
             raise ValueError(f"Video {video_id} not found")
 
-        # Run face detection (would use the video file)
-        # In production, this would use the stored video path
-        faces = self.face_detector.detect_faces  # Reference to method
+        # Run face detection
+        faces = self.face_detector.detect_faces(frame)
 
         return {
             "video_id": str(video_id),
-            "detected": True,
-            "face_count": 1,  # Would be calculated
-            "tracking_data": {},
+            "detected": len(faces) > 0,
+            "face_count": len(faces),
+            "tracking_data": {f"face_{i}": face.bbox for i, face in enumerate(faces)},
         }
 
     async def get_camera_path(self, video_id: UUIDType) -> Optional[CameraPath]:

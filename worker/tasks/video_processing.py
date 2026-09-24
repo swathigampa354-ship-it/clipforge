@@ -111,8 +111,16 @@ async def _process_video_async(job_id: str, video_id: str, project_id: str, user
 async def _update_job_progress(db: AsyncSession, job_id: str, stage: str, progress: float, error: str = None):
     """Update job progress in database"""
     from api.models.core import Video
-    # Update video status
-    pass
+    from sqlalchemy import update
+    try:
+        stmt = update(Video).where(Video.id == job_id).values(
+            status=stage, progress=progress,
+            updated_at=datetime.now(timezone.utc)
+        )
+        await db.execute(stmt)
+        await db.commit()
+    except Exception as e:
+        logger.error(f"Failed to update job progress: {str(e)}")
 
 
 @shared_task(bind=True, max_retries=3)

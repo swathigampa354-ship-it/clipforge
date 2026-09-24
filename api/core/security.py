@@ -1,7 +1,8 @@
 import os
 import json
 from pathlib import Path
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+from uuid import UUID
 
 import bcrypt
 from jose import JWTError, jwt
@@ -24,8 +25,8 @@ def create_access_token(user_id: UUID, expires_minutes: int = None) -> str:
     expires_delta = timedelta(minutes=expires_minutes or settings.JWT_EXPIRY_MINUTES)
     to_encode = {
         "sub": str(user_id),
-        "exp": datetime.utcnow() + expires_delta,
-        "iat": datetime.utcnow(),
+        "exp": datetime.now(timezone.utc) + expires_delta,
+        "iat": datetime.now(timezone.utc),
         "type": "access",
     }
     return jwt.encode(to_encode, settings.JWT_SECRET, algorithm="HS256")
