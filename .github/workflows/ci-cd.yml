@@ -43,19 +43,15 @@ jobs:
 
       - name: Ruff lint
         run: |
-          ruff check api/ worker/ tests/ || true
+          ruff check api/ worker/ tests/
 
       - name: Black format check
         run: |
-          black --check --diff api/ worker/ tests/ || true
+          black --check --diff api/ worker/ tests/
 
       - name: MyPy type check
         run: |
-          mypy api/ worker/ --ignore-missing-imports --no-error-summary || true
-
-      - name: Lint summary
-        run: |
-          echo "## 🔍 Lint Results" >> $GITHUB_STEP_SUMMARY
+          mypy api/ worker/ --ignore-missing-imports --no-error-summary
 
   # ── Unit Tests ──
   test:
@@ -101,9 +97,9 @@ jobs:
           pip install --quiet fastapi uvicorn pydantic pydantic-settings sqlalchemy asyncpg alembic
           pip install --quiet celery redis python-jose passlib python-multipart httpx aiofiles
           pip install --quiet python-minio pillow opencv-python-headless numpy pyyaml python-dotenv
-          pip install --quiet rich structlog slowapi
+          pip install --quiet rich structlog slowapi faster-whisper
           pip install --quiet pytest pytest-asyncio pytest-cov aiosqlite httpx
-          pip install --quiet --no-deps mediapipe opencv-python-headless numpy
+          pip install --quiet --no-deps mediapipe
           echo "Core dependencies installed"
 
       - name: Install api package
@@ -111,6 +107,15 @@ jobs:
           cd api && pip install --quiet -e .
           cd ..
           echo "API package installed"
+
+      - name: Run migrations
+        run: |
+          cd api && alembic upgrade head
+          cd ..
+          echo "Migrations complete"
+        env:
+          DATABASE_URL: postgresql+asyncpg://test_user:test_pass@localhost:5432/test_db
+          REDIS_URL: redis://localhost:6379/0
 
       - name: Wait for PostgreSQL
         run: |
@@ -127,7 +132,7 @@ jobs:
           export DATABASE_URL="postgresql+asyncpg://test_user:test_pass@localhost:5432/test_db"
           export REDIS_URL="redis://localhost:6379/0"
           export SECRET_KEY="test-secret-key"
-          pytest tests/ -v --tb=short --ignore=tests/unit/test_main.py
+          pytest tests/ -v --tb=short --cov=api --cov-report=xml --cov-report=term-missing
         env:
           DATABASE_URL: postgresql+asyncpg://test_user:test_pass@localhost:5432/test_db
           REDIS_URL: redis://localhost:6379/0
@@ -186,9 +191,9 @@ jobs:
 
       - name: Deploy to staging
         run: |
-          docker compose -f docker-compose.yml pull
-          docker compose -f docker-compose.yml up -d --force-recreate
-          docker compose -f docker-compose.yml ps
+          docker compose -f docker-compose.dev.yml pull
+          docker compose -f docker-compose.dev.yml up -d --force-recreate
+          docker compose -f docker-compose.dev.yml ps
 
   # ── Deploy to Production ──
   deploy-production:
