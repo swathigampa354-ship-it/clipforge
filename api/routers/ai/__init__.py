@@ -13,6 +13,7 @@ from api.models.user import User
 from api.services.ai.analysis_engine import AIAnalysisService, TranscriptProcessor
 from api.services.ai.clip_detection import ClipDetectionService
 from api.services.ai.transcript_service import TranscriptService
+from api.services.ai.ollama_service import OllamaService
 
 router = APIRouter()
 
@@ -147,5 +148,85 @@ async def get_analysis_status(
         transcript_service = TranscriptService(db)
         stats = await transcript_service.get_transcript_stats(video_id)
         return ApiResponse(data=stats)
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+
+@router.get("/ollama/health")
+async def ollama_health(
+    current_user: User = Depends(get_current_user),
+):
+    """Check if Ollama is running"""
+    try:
+        service = OllamaService()
+        healthy = await service.health_check()
+        models = await service.list_models() if healthy else []
+        return ApiResponse(data={
+            "healthy": healthy,
+            "base_url": settings.OLLAMA_BASE_URL,
+            "model": settings.OLLAMA_MODEL,
+            "models": models,
+        })
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(e))
+
+
+@router.get("/ollama/models")
+async def ollama_models(
+    current_user: User = Depends(get_current_user),
+):
+    """List available Ollama models"""
+    try:
+        service = OllamaService()
+        models = await service.list_models()
+        return ApiResponse(data={"models": models})
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(e))
+
+
+@router.post("/ollama/generate")
+async def ollama_generate(
+    prompt: str,
+    system: Optional[str] = None,
+    current_user: User = Depends(get_current_user),
+):
+    """Generate text using Ollama"""
+    try:
+        service = OllamaService()
+        response = await service.generate(prompt, system=system)
+        return ApiResponse(data={"response": response})
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+
+@router.post("/ollama/summarize")
+async def ollama_summarize(
+    text: str,
+    max_length: int = 200,
+    current_user: User = Depends(get_current_user),
+):
+    """Summarize text using Ollama"""
+    try:
+        service = OllamaService()
+        summary = await service.summarize(text, max_length=max_length)
+        return ApiResponse(data={"summary": summary})
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+
+@router.post("/ollama/analyze")
+async def ollama_analyze(
+    transcript: str,
+    current_user: User = Depends(get_current_user),
+):
+    """Analyze a transcript segment using Ollama"""
+    try:
+        service = OllamaService()
+        analysis = await service.generate_clip_analysis(
+            transcript_segment=transcript,
+            segment_start=0,
+            segment_end=30,
+        )
+        return ApiResponse(data=analysis)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

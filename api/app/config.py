@@ -25,6 +25,9 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: str = ""
     DEEPGRAM_API_KEY: str = ""
     ELEVENLABS_API_KEY: str = ""
+    OLLAMA_BASE_URL: str = "http://localhost:11434"
+    OLLAMA_MODEL: str = "llama3"
+    OLLAMA_EMBEDDING_MODEL: str = "nomic-embed-text"
 
     MAX_FILE_SIZE_MB: int = 16384
     CLIPPYME_BIND: str = "0.0.0.0"
