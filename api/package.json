@@ -1,0 +1,16 @@
+{
+  "name": "clipforge-api",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "uvicorn api.app.main:app --reload --host 0.0.0.0 --port 8000",
+    "start": "uvicorn api.app.main:app --host 0.0.0.0 --port 8000 --workers 4",
+    "migrate": "alembic upgrade head",
+    "test": "pytest tests/ -v",
+    "lint": "ruff check api/ worker/",
+    "typecheck": "mypy api/ worker/"
+  },
+  "dependencies": {
+    "clipforge-shared": "0.1.0"
+  }
+}

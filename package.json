@@ -1,0 +1,26 @@
+{
+  "name": "clipforge",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "api",
+    "packages/shared"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace=frontend\" \"npm run dev --workspace=api\"",
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspaces",
+    "lint": "npm run lint --workspaces",
+    "docker:up": "docker compose up --build",
+    "docker:down": "docker compose down",
+    "docker:dev": "docker compose -f docker-compose.yml --profile dev up",
+    "docker:prod": "docker compose -f docker-compose.prod.yml up -d",
+    "worker": "docker compose --profile worker up",
+    "db:migrate": "cd api && alembic upgrade head",
+    "db:reset": "cd api && alembic downgrade base && alembic upgrade head"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
