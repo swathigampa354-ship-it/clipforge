@@ -2,8 +2,17 @@
 Update router aggregator to include reframe router
 """
 from fastapi import APIRouter
-from api.routers import auth_router, projects_router, videos_router, clips_router, renders_router, ai_router, usage_router, api_keys_router, subscriptions_router, reframe_router
+from api.routers.auth import router as auth_router
+from api.routers.projects import router as projects_router
+from api.routers.videos import router as videos_router
+from api.routers.clips import router as clips_router
+from api.routers.reframe import router as reframe_router
+from api.routers.renders import router as renders_router
+from api.routers.ai import router as ai_router
 from api.routers.captions import router as captions_router
+from api.routers.usage import router as usage_router
+from api.routers.api_keys import router as api_keys_router
+from api.routers.subscriptions import router as subscriptions_router
 
 api_router = APIRouter()
 
