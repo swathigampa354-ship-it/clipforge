@@ -10,9 +10,9 @@ class Settings(BaseSettings):
     APP_VERSION: str = "0.1.0"
     ENVIRONMENT: str = "development"
 
-    DATABASE_URL: str
-    REDIS_URL: str
-    JWT_SECRET: str
+    DATABASE_URL: str = "postgresql+asyncpg://clipforge:clipforge_secret@localhost:5432/clipforge"
+    REDIS_URL: str = "redis://localhost:6379/0"
+    JWT_SECRET: str = "dev-secret-key-change-in-production"
     JWT_EXPIRY_MINUTES: int = 15
 
     STORAGE_TYPE: str = "local"
